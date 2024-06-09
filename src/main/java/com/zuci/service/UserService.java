@@ -78,4 +78,12 @@ public class UserService {
         user.setCountry(userDetails.getCountry());
         return userRepository.save(user);
     }
+    public void logout(String token) {
+        String username = jwtTokenUtil.extractUsername(token);
+        SecurityContextHolder.clearContext();
+    }
+
+    public String getUsernameFromToken(String token) {
+        return jwtTokenUtil.extractUsername(token);
+    }
 }

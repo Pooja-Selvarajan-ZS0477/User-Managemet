@@ -6,11 +6,13 @@ import com.zuci.service.otpservice;
 import com.zuci.repository.UserRepository;
 import com.zuci.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -48,6 +50,17 @@ public class UserController {
     @GetMapping("/listusers")
     public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @GetMapping("/listusers/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable("id") int id) {
+        Optional<User> userOptional = userService.getUserById(id);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 
@@ -127,6 +140,12 @@ public class UserController {
             return "New OTP sent to your email.";
         }
         return "User not found.";
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String tokenHeader) {
+        String token = tokenHeader.substring(7);
+        userService.logout(token);
+        return ResponseEntity.status(HttpStatus.OK).body("Logged out successfully");
     }
 
 }
